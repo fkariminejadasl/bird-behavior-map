@@ -1,0 +1,39 @@
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "bird-behavior-map"
+version = "0.1.0"
+description = "Interactive app mapping bird GPS tracks, coloured by behavior predicted from accelerometer bursts and GPS speed"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {file = "LICENSE"}
+authors = [{name = "Fatemeh Karimi Nejadasl"}]
+dependencies = [
+    "numpy>=1.23",
+    "pandas>=2.0",
+    # runs the trained classifier. The CPU wheel is enough:
+    # pip install torch --index-url https://download.pytorch.org/whl/cpu
+    "torch>=2.0",
+    "psycopg2-binary",  # the e-ecology PostgreSQL database
+    "dash>=3.0",  # the app
+    "plotly>=6.0",  # the map and the plots
+]
+
+[project.optional-dependencies]
+test = [
+    "black",
+    "isort",
+    "pyflakes",
+]
+
+[tool.setuptools.packages.find]
+include = ["bird_behavior_map*"]
+
+# the trained weights ship with the package
+[tool.setuptools.package-data]
+bird_behavior_map = ["models/*.pth"]
+
+# for linters
+# black bird_behavior_map -l 88; isort bird_behavior_map --profile black; pyflakes bird_behavior_map
