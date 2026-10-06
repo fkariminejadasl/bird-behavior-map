@@ -10,13 +10,17 @@ label, the app shows both.
 
 ## Install
 
+Python 3.10 or newer. Git is not needed: pip downloads the repository itself.
+
 ```bash
 pip install torch --index-url https://download.pytorch.org/whl/cpu
-pip install .
+pip install https://github.com/fkariminejadasl/bird-behavior-map/archive/refs/heads/main.zip
 ```
 
-The classifier is small and runs on the processor, so the CPU build of PyTorch
-is enough. The trained weights ship inside the package.
+New to Python? [INSTALL.md](INSTALL.md) goes through it step by step on
+Windows, macOS and Linux. The classifier is small and runs on the processor,
+so the CPU build of PyTorch is enough. The trained weights ship inside the
+package.
 
 ## Make the data
 
