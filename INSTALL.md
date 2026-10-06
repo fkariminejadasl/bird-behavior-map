@@ -49,7 +49,7 @@ An environment is a folder that holds the Python packages of this app, apart
 from everything else on the computer.
 
 ```
-conda create -n bird-map python=3.12
+conda create -n bird-map python=3.14
 conda activate bird-map
 ```
 
@@ -102,6 +102,7 @@ terminal. The [README](README.md) says what the app shows and what else
 |---|---|
 | `conda is not recognized` (Windows) | This is PowerShell or cmd. Open the *Anaconda Prompt* from the Start menu instead. |
 | `conda: command not found` (macOS, Ubuntu) | Close the terminal and open a new one. If it stays, run `~/miniconda3/bin/conda init` and open a new terminal again. |
+| `No matching distribution found for torch` (Mac with an Intel chip) | PyTorch no longer ships for Macs with an Intel chip, sold before 2021; Macs with an Apple chip are fine. Making data is not possible there. The app alone still runs on a CSV someone else made: in step 4 type `pip install dash plotly pandas numpy`, then the second line with `--no-deps` added after `install`. |
 | `No module named bird_behavior_map` | The environment is off. Type `conda activate bird-map`. |
 | `Set DB_USER and DB_PASS, or give --database-url` | Step 5. The last two lines, deactivate and activate, are needed. |
 | `No bursts with a GPS fix in this range` | The device recorded no accelerometer data then. Try another range. |

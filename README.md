@@ -24,13 +24,14 @@ package.
 
 ## Make the data
 
-The app reads one CSV. `make_data.py` writes it, from three kinds of input:
+The app reads one CSV in the [data format](#data-format) below. `make_data.py`
+writes it, from three kinds of input:
 
 | input | command |
 |---|---|
 | the e-ecology database | `python -m bird_behavior_map.make_data --device 6004 --start 2013-05-24 --end 2013-05-31 --output 6004.csv` |
-| an 8-column CSV, no GPS fix yet | `python -m bird_behavior_map.make_data --input imu.csv --output out.csv` |
-| a 12- or 13-column CSV | `python -m bird_behavior_map.make_data --input app.csv --output out.csv` |
+| a CSV with columns 1 to 8 only, `device_id` to `gps_speed`: the fix is added from the database, then the classes | `python -m bird_behavior_map.make_data --input imu.csv --output out.csv` |
+| a CSV with columns 1 to 12 or 13, the app format itself: only the classes are redone | `python -m bird_behavior_map.make_data --input app.csv --output out.csv` |
 
 The first two need the database account: `export DB_USER=... DB_PASS=...`, or
 `--database-url postgresql://user:password@pub.e-ecology.nl:5432/eecology`.
@@ -63,18 +64,18 @@ CSV without header, one row per accelerometer sample, 20 rows per burst. A
 burst is one `device_id` and `date_time`. A fix carries 20, 40 or 60 samples,
 that is 1 to 3 bursts.
 
-| column | value |
-|---|---|
-| device_id | tracker number |
-| date_time | time of the GPS fix, `YYYY-MM-DD HH:MM:SS` UTC, the same for the 20 rows of a burst |
-| index | sample number within the fix, from 0 |
-| gt_label | expert label, -1 when there is none |
-| imu_x, imu_y, imu_z | acceleration in g |
-| gps_speed | 2D speed of the fix, m/s |
-| label | predicted class |
-| confidence | its probability |
-| latitude, longitude | of the fix |
-| altitude | of the fix, m. Optional: shown as -1 when the column is missing |
+| | column | value |
+|---|---|---|
+| 1 | device_id | tracker number |
+| 2 | date_time | time of the GPS fix, `YYYY-MM-DD HH:MM:SS` UTC, the same for the 20 rows of a burst |
+| 3 | index | sample number within the fix, from 0 |
+| 4 | gt_label | expert label, -1 when there is none |
+| 5, 6, 7 | imu_x, imu_y, imu_z | acceleration in g |
+| 8 | gps_speed | 2D speed of the fix, m/s |
+| 9 | label | predicted class, -1 before classification |
+| 10 | confidence | its probability, -1 before classification |
+| 11, 12 | latitude, longitude | of the fix |
+| 13 | altitude | of the fix, m. Optional: shown as -1 when the column is missing |
 
 Classes: 0 Flap, 1 ExFlap, 2 Soar, 3 Boat, 4 Float, 5 SitStand, 6 TerLoco,
 7 Other, 8 Manouvre, 9 Pecking. The classifier never predicts 7.
