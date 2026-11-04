@@ -41,6 +41,29 @@ In every case the rows are sorted by device, time and index, bursts with a GPS
 speed of 30 m/s or more are dropped (sensor error), the acceleration is clipped
 to [-2, 2] g, and every burst gets a class and a confidence.
 
+## One row per burst, for other apps
+
+The app needs every sample. Other apps only need the behavior, so
+`write_behavior.py` writes one row per burst instead, with a header. The data,
+the filters and the model are the same as above.
+
+```bash
+python -m bird_behavior_map.write_behavior --device 6004 --start 2013-05-24 --end 2013-05-31 --output 6004_behavior.csv
+python -m bird_behavior_map.write_behavior --device 6004 6011 --start 2013-05-01 --end 2013-05-31 --output behavior.csv
+```
+
+| column | value |
+|---|---|
+| device_info_serial | tracker number |
+| date_time | time of the GPS fix, UTC |
+| first_index | index of the first sample of the burst: 0, 20, 40, ... |
+| burst_time | time of that sample: `date_time` + `first_index` x 0.05 s (20 samples per second) |
+| model | the model that made the class, e.g. `exp197` |
+| class_id, class_name | the class, as in [Data format](#data-format) |
+| confidence | its probability, 0 to 1 |
+
+A fix with 200 samples gives 10 rows. Bursts dropped by the filters have none.
+
 ## Run the app
 
 ```bash
