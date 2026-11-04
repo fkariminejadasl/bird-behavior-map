@@ -49,7 +49,7 @@ the filters and the model are the same as above.
 
 ```bash
 python -m bird_behavior_map.write_behavior --device 6004 --start 2013-05-24 --end 2013-05-31 --output 6004_behavior.csv
-python -m bird_behavior_map.write_behavior --device 6004 6011 --start 2013-05-01 --end 2013-05-31 --output behavior.csv
+python -m bird_behavior_map.write_behavior --device 6004 6011 --start 2013-05-01 --end 2013-05-31 --output behavior.csv --per-fix behavior_per_fix.csv
 ```
 
 | column | value |
@@ -63,6 +63,17 @@ python -m bird_behavior_map.write_behavior --device 6004 6011 --start 2013-05-01
 | confidence | its probability, 0 to 1 |
 
 A fix with 200 samples gives 10 rows. Bursts dropped by the filters have none.
+
+`--per-fix` also writes one row per GPS fix, for apps that show one point per
+fix, as this app does:
+
+| column | value |
+|---|---|
+| device_info_serial, date_time | the fix |
+| model | the model that made the classes |
+| first_class | class of the first burst: colour the point by this |
+| all_classes | classes of all bursts in order, e.g. `TerLoco,TerLoco,Pecking` |
+| n_bursts | number of bursts, 1 to 10 |
 
 ## Run the app
 

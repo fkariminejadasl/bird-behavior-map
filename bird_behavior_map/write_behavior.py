@@ -18,8 +18,18 @@ behaviors would hold. Columns, with a header:
 A fix with 200 samples gives 10 rows. Bursts dropped by the filters (missing
 values, no GPS fix in the same second, GPS speed of 30 m/s or more) have none.
 
+With --per-fix, a second CSV has one row per GPS fix, for apps that show one
+point per fix, as the map app does:
+
+    device_info_serial  tracker
+    date_time           time of the GPS fix, UTC
+    model               the model that made the classes
+    first_class         class of the first burst: colour the point by this
+    all_classes         classes of all bursts in order, e.g. TerLoco,TerLoco,Pecking
+    n_bursts            number of bursts, 1 to 10
+
     python -m bird_behavior_map.write_behavior --device 6004 --start 2013-05-24 --end 2013-05-31 --output 6004_behavior.csv
-    python -m bird_behavior_map.write_behavior --device 6004 6011 --start 2013-05-01 --end 2013-05-31 --output behavior.csv
+    python -m bird_behavior_map.write_behavior --device 6004 6011 --start 2013-05-01 --end 2013-05-31 --output behavior.csv --per-fix behavior_per_fix.csv
 
 The database needs the DB_USER and DB_PASS environment variables, or
 --database-url.
@@ -64,6 +74,17 @@ def to_bursts(
     )
 
 
+def per_fix(bursts: pd.DataFrame) -> pd.DataFrame:
+    """One row per GPS fix from the rows of `to_bursts`, which come ordered by
+    tracker, time and first index."""
+    fixes = bursts.groupby(["device_info_serial", "date_time", "model"], sort=False)
+    return (
+        fixes["class_name"]
+        .agg(first_class="first", all_classes=",".join, n_bursts="size")
+        .reset_index()
+    )
+
+
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     parser.add_argument(
@@ -74,6 +95,9 @@ def main(argv=None):
     )
     parser.add_argument("--end", required=True, help="last time, inclusive")
     parser.add_argument("--output", type=Path, required=True, help="the CSV to write")
+    parser.add_argument(
+        "--per-fix", type=Path, help="also write one row per GPS fix to this CSV"
+    )
     parser.add_argument(
         "--model", default=MODEL_NAME, help="name stored with each class"
     )
@@ -103,6 +127,10 @@ def main(argv=None):
     rows = pd.concat(parts)
     rows.to_csv(args.output, index=False, float_format="%.6f")
     print(f"{len(rows)} bursts written to {args.output}")
+    if args.per_fix:
+        fixes = per_fix(rows)
+        fixes.to_csv(args.per_fix, index=False)
+        print(f"{len(fixes)} fixes written to {args.per_fix}")
 
 
 if __name__ == "__main__":
