@@ -75,6 +75,29 @@ fix, as this app does:
 | all_classes | classes of all bursts in order, e.g. `TerLoco,TerLoco,Pecking` |
 | n_bursts | number of bursts, 1 to 10 |
 
+### Every night, on an always-on computer
+
+`scripts/` writes these files for chosen trackers, one pair per tracker per
+month, in `~/behavior/out`. The scripts are in the repository, not in the
+installed package, so get the repository folder (download or clone it) and
+install it from there with `pip install .`.
+
+1. Put the settings in a private file, `~/behavior/settings.env`
+   (`chmod 600` it):
+   ```bash
+   export DB_USER=... DB_PASS=...
+   TRACKERS="6004 6011"
+   PYTHON=~/behavior/venv/bin/python   # the Python bird-behavior-map is installed in
+   FIRST_MONTH=2013-01                 # first month for the backfill
+   ```
+2. Once, all past months: `scripts/backfill.sh`. A busy tracker-month takes
+   about 30 s. If it stops, start it again: finished months are skipped.
+3. Every night, this month again (and last month in the first 7 days of a
+   month, for data that arrives late). With `crontab -e`, at 03:00:
+   ```
+   0 3 * * * /path/to/bird-behavior-map/scripts/nightly.sh >> $HOME/behavior/nightly.log 2>&1
+   ```
+
 ## Run the app
 
 ```bash
