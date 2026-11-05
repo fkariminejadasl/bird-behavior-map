@@ -182,10 +182,17 @@ def match_gps(bursts: list[list[list]], gps: pd.DataFrame) -> list[tuple]:
     return matched
 
 
+def _end_time(end: str) -> datetime:
+    """The last time of an inclusive range. A date alone, `2013-05-31`, means
+    the end of that day, 23:59:59; database times are in whole seconds."""
+    t = datetime.fromisoformat(end)
+    return t + timedelta(days=1, seconds=-1) if ":" not in end else t
+
+
 def _chunks(start: str, end: str, days: int) -> list[tuple[str, str]]:
     """Split the inclusive range into inclusive pieces of at most `days` days."""
     t0 = datetime.fromisoformat(start)
-    t1 = datetime.fromisoformat(end)
+    t1 = _end_time(end)
     pieces = []
     while t0 <= t1:
         t_next = min(t0 + timedelta(days=days), t1 + timedelta(seconds=1))

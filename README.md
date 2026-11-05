@@ -41,6 +41,68 @@ In every case the rows are sorted by device, time and index, bursts with a GPS
 speed of 30 m/s or more are dropped (sensor error), the acceleration is clipped
 to [-2, 2] g, and every burst gets a class and a confidence.
 
+## One row per burst, for other apps
+
+The app needs every sample. Other apps only need the behavior, so
+`write_behavior.py` writes one row per burst instead, with a header. The data,
+the filters and the model are the same as above.
+
+```bash
+python -m bird_behavior_map.write_behavior --device 6004 --start 2013-05-24 --end 2013-05-31 --output 6004_behavior.csv
+python -m bird_behavior_map.write_behavior --device 6004 6011 --start 2013-05-01 --end 2013-05-31 --output behavior.csv --per-fix behavior_per_fix.csv
+```
+
+| column | value |
+|---|---|
+| device_info_serial | tracker number |
+| date_time | time of the GPS fix, UTC |
+| first_index | index of the first sample of the burst: 0, 20, 40, ... |
+| burst_time | time of that sample: `date_time` + `first_index` x 0.05 s (20 samples per second) |
+| model | the model that made the class, e.g. `exp197` |
+| class_id, class_name | the class, as in [Data format](#data-format) |
+| confidence | its probability, 0 to 1 |
+
+A fix with 200 samples gives 10 rows. Bursts dropped by the filters have none.
+
+`--per-fix` also writes one row per GPS fix, for apps that show one point per
+fix, as this app does:
+
+| column | value |
+|---|---|
+| device_info_serial, date_time | the fix |
+| model | the model that made the classes |
+| first_class | class of the first burst: colour the point by this |
+| all_classes | classes of all bursts in order, e.g. `TerLoco,TerLoco,Pecking` |
+| n_bursts | number of bursts, 1 to 10 |
+
+### Every night, on an always-on computer
+
+`scripts/` writes these files for chosen trackers, one pair per tracker per
+month, in `~/behavior/out`. The scripts are in the repository, not in the
+installed package, so get the repository folder (download or clone it) and
+install it from there with `pip install .`.
+
+1. Put the settings in a private file, `~/behavior/settings.env`
+   (`chmod 600` it):
+   ```bash
+   export DB_USER=... DB_PASS=...
+   TRACKERS="6004 6011"
+   PYTHON=~/behavior/venv/bin/python   # the Python bird-behavior-map is installed in
+   FIRST_MONTH=2013-01                 # first month for the backfill
+   ```
+2. Once, all past months: `scripts/backfill.sh`. A busy tracker-month takes
+   about 30 s. If it stops, start it again: finished months are skipped.
+3. Every night, this month again (and last month in the first 7 days of a
+   month, for data that arrives late). With `crontab -e`, at 03:00:
+   ```
+   0 3 * * * /path/to/bird-behavior-map/scripts/nightly.sh >> $HOME/behavior/nightly.log 2>&1
+   ```
+
+Into the database (drafts, waiting for permission to write there):
+`sql/behavior.sql` creates the table and the per-fix summary once, and
+`sql/load_behavior.sql` loads one month file into the table, replacing what
+was there for that tracker and month.
+
 ## Run the app
 
 ```bash
