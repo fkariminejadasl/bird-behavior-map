@@ -98,6 +98,11 @@ install it from there with `pip install .`.
    0 3 * * * /path/to/bird-behavior-map/scripts/nightly.sh >> $HOME/behavior/nightly.log 2>&1
    ```
 
+Into the database (drafts, waiting for permission to write there):
+`sql/behavior.sql` creates the table and the per-fix summary once, and
+`sql/load_behavior.sql` loads one month file into the table, replacing what
+was there for that tracker and month.
+
 ## Run the app
 
 ```bash
