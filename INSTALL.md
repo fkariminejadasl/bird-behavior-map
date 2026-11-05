@@ -30,8 +30,10 @@ has every installer.
 
 ## 2. Open a terminal
 
-- **Windows**: press the Start key, type `Anaconda Prompt`, press Enter. Use
-  this prompt, not PowerShell, for everything below.
+- **Windows**: press the Start key, type `Anaconda Prompt`, press Enter.
+  Miniconda installs it under this name, as *Anaconda Prompt (miniconda3)*;
+  the large Anaconda is not needed. Use this prompt, not PowerShell, for
+  everything below.
 - **macOS**: press Cmd+Space, type `Terminal`, press Enter.
 - **Ubuntu**: press Ctrl+Alt+T.
 
