@@ -33,7 +33,10 @@ writes it, from three kinds of input:
 | a CSV with columns 1 to 8 only, `device_id` to `gps_speed`: the fix is added from the database, then the classes | `python -m bird_behavior_map.make_data --input imu.csv --output out.csv` |
 | a CSV with columns 1 to 12 or 13, the app format itself: only the classes are redone | `python -m bird_behavior_map.make_data --input app.csv --output out.csv` |
 
-The first two need the database account: `export DB_USER=... DB_PASS=...`, or
+The first two need an account on the e-ecology database. `make_data` asks for
+the user name and password, unless they are in the environment:
+`export DB_USER=... DB_PASS=...` (Windows: `set DB_USER=...` and
+`set DB_PASS=...`), or
 `--database-url postgresql://user:password@pub.e-ecology.nl:5432/eecology`.
 `--start` and `--end` are inclusive, as `YYYY-MM-DD` or `YYYY-MM-DD HH:MM:SS`.
 

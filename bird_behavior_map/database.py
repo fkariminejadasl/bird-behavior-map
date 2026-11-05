@@ -16,9 +16,12 @@ The connection needs the DB_USER and DB_PASS environment variables, or a full
 URL, `postgresql://user:password@pub.e-ecology.nl:5432/eecology`.
 """
 
+import getpass
 import os
+import sys
 import time
 from datetime import datetime, timedelta, timezone
+from urllib.parse import quote
 
 import pandas as pd
 import psycopg2
@@ -28,12 +31,19 @@ TIME_FORMAT = "%Y-%m-%d %H:%M:%S"
 
 
 def database_url(user: str | None = None, password: str | None = None) -> str:
-    """The connection URL, by default from the DB_USER and DB_PASS variables."""
+    """The connection URL, by default from the DB_USER and DB_PASS variables.
+
+    When they are not set and someone is typing, ask for them. The password is
+    percent-encoded, so characters such as @, : and / in it are kept.
+    """
     user = user or os.getenv("DB_USER")
     password = password or os.getenv("DB_PASS")
+    if (not user or not password) and sys.stdin.isatty():
+        user = user or input("e-ecology database user name: ").strip()
+        password = password or getpass.getpass("e-ecology database password: ")
     if not user or not password:
         raise ValueError("Set DB_USER and DB_PASS, or give --database-url.")
-    return f"postgresql://{user}:{password}@{HOST}"
+    return f"postgresql://{quote(user, safe='')}:{quote(password, safe='')}@{HOST}"
 
 
 def query(url: str, sql: str, retries: int = 5, delay: int = 5) -> list[tuple]:

@@ -71,8 +71,9 @@ added after `install`.
 
 ## 5. Give the database account
 
-Downloading data needs an account on the e-ecology database. Store the user
-name and password in the environment, once:
+Downloading data needs an account on the e-ecology database. `make_data` in
+step 6 asks for the user name and password; the password stays hidden while
+you type it. To not be asked every time, store them in the environment, once:
 
 ```
 conda env config vars set DB_USER=name DB_PASS=secret
@@ -104,6 +105,6 @@ terminal. The [README](README.md) says what the app shows and what else
 | `conda: command not found` (macOS, Ubuntu) | Close the terminal and open a new one. If it stays, run `~/miniconda3/bin/conda init` and open a new terminal again. |
 | `No matching distribution found for torch` (Mac with an Intel chip) | PyTorch no longer ships for Macs with an Intel chip, sold before 2021; Macs with an Apple chip are fine. Making data is not possible there. The app alone still runs on a CSV someone else made: in step 4 type `pip install dash plotly pandas numpy`, then the second line with `--no-deps` added after `install`. |
 | `No module named bird_behavior_map` | The environment is off. Type `conda activate bird-map`. |
-| `Set DB_USER and DB_PASS, or give --database-url` | Step 5. The last two lines, deactivate and activate, are needed. |
+| `Set DB_USER and DB_PASS, or give --database-url` | Update the app (step 4, with `--force-reinstall --no-deps`); it then asks for the user name and password. Or do step 5, with its last two lines, deactivate and activate. |
 | `No bursts with a GPS fix in this range` | The device recorded no accelerometer data then. Try another range. |
 | `Address already in use` | Another program uses port 8050. Add a port: `python -m bird_behavior_map.app 6004.csv 8060`, and open 127.0.0.1:8060. |
