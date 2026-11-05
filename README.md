@@ -109,9 +109,15 @@ was there for that tracker and month.
 ## Run the app
 
 ```bash
-python -m bird_behavior_map.app 6004.csv        # http://127.0.0.1:8050
-python -m bird_behavior_map.app 6004.csv 8060   # another port
+python -m bird_behavior_map.app 6004.csv        # open http://127.0.0.1:8050
+python -m bird_behavior_map.app 6011.csv 8060   # open http://127.0.0.1:8060
 ```
+
+The second number, the port, is optional (default 8050) and gives the app its
+own address. To show several CSV files at the same time, start each in its own
+terminal with its own port (8060, 8070, ...) and open each address in its own
+browser tab. Ctrl+C in a terminal stops that app. To switch one app to another
+file, stop it, start it with the new file and reload the page in the browser.
 
 - **Bird/device** and the **time window** slider choose what the map shows.
 - **Inspect point**: click a burst to see its accelerometer trace, predicted
