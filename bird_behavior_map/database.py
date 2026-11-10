@@ -14,6 +14,30 @@ run, and bursts whose fix has no GPS speed.
 
 The connection needs the DB_USER and DB_PASS environment variables, or a full
 URL, `postgresql://user:password@pub.e-ecology.nl:5432/eecology`.
+
+Database tables (note of 2026-11-10; the code is unchanged). The code reads
+three views, which show only the trackers and dates a user has access to:
+
+    view (read now)                table under it
+    gps.ee_tracker_limited         gps.ee_tracker            calibration
+    gps.ee_tracking_speed_limited  gps.uva_tracking_data101  GPS fixes
+    gps.ee_acceleration_limited    gps.uva_acceleration101   accelerometer
+
+gps.uva_acceleration101 is itself a view of both kinds of tracker:
+- UvA-BiTS: gps.uva_acceleration101_data, one row per sample, stamped with
+  the GPS fix time.
+- Ornitela: gps.ee_bccelero_burst, one row per burst with its start time, and
+  gps.ee_bccelero_point, one row per sample (20 per second). A burst starts
+  0 to 3 s after its fix, so `match_gps`, which needs the same second, drops
+  most of them. x and y are already swapped by the database. There is no
+  calibration; a test used offset 0 and scale 1058.8 (ORNITELA_ACC_SCALE in
+  bird-behavior) for all three axes.
+
+On e-ecology (UvA-BiTS trackers 6004 and 6011, 24-31 May 2013), the tables
+gave the same rows and the same write_behavior output as the views. On the
+test database johannes_playground (Ornitela trackers), the views are empty for
+my user, so a test script kept outside this repository read the tables
+instead, pairing each burst with the fix 0 to 3 s before it.
 """
 
 import getpass
