@@ -33,6 +33,13 @@ writes it, from three kinds of input:
 | the e-ecology database | `python -m bird_behavior_map.make_data --device 6004 --start 2013-05-24 --end 2013-05-31 --output 6004.csv` |
 | a CSV with columns 1 to 8 only, `device_id` to `gps_speed`: the fix is added from the database, then the classes | `python -m bird_behavior_map.make_data --input imu.csv --output out.csv` |
 | a CSV with columns 1 to 12 or 13, the app format itself: only the classes are redone | `python -m bird_behavior_map.make_data --input app.csv --output out.csv` |
+| an Ornitela export, with GPS and accelerometer rows (`datatype` GPS or SENSORS): no database needed | `python -m bird_behavior_map.make_data --input examples/243354_ornitela.csv --output 243354.csv` |
+
+For an Ornitela export, each burst takes the GPS fix of the same device that
+is nearest in time, at most 2 s before or after (the earlier one on a tie),
+x and y are swapped to the UvA-BiTS axes, and the speed goes from km/h to m/s.
+The time in the output is that of the burst, about 1 s after its fix.
+`examples/243354_ornitela.csv` is a short example of such an export.
 
 The first two need an account on the e-ecology database. `make_data` asks for
 the user name and password, unless they are in the environment:
