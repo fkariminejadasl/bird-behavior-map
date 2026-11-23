@@ -1,7 +1,7 @@
 """Make the CSV the app reads: one row per accelerometer sample, with the GPS
 fix and the predicted behavior of its burst.
 
-Three ways in:
+Four ways in:
 
     python -m bird_behavior_map.make_data --device 6004 --start 2013-05-24 --end 2013-05-31 --output 6004.csv
         downloads the bursts and fixes of one device from the e-ecology database
@@ -11,6 +11,9 @@ Three ways in:
     python -m bird_behavior_map.make_data --input app.csv --output out.csv
         a 12- or 13-column CSV that already has the fix: only the classes
         are redone
+    python -m bird_behavior_map.make_data --input ornitela.csv --output out.csv
+        an Ornitela export, with GPS and accelerometer rows (ornitela.py):
+        no database needed
 
 Then, as in bird-behavior `scripts/data/bird_behavior_app_data.py`: rows are
 sorted by device, time and index; bursts with a GPS speed of 30 m/s or more are
@@ -31,7 +34,7 @@ from pathlib import Path
 
 import pandas as pd
 
-from bird_behavior_map import database, model
+from bird_behavior_map import database, model, ornitela
 
 MAX_SPEED = 30.0  # m/s; faster is sensor error
 CLIP = 2.0  # g
@@ -46,20 +49,27 @@ def prepare(df: pd.DataFrame, checkpoint: Path, glen: int = model.GLEN) -> pd.Da
 
 
 def load_input(path: Path, url: str | None, chunk_days: int) -> pd.DataFrame:
+    if ornitela.is_export(path):
+        return ornitela.read_export(path, model.GLEN)
     df = pd.read_csv(path, header=None)
     if df.shape[1] == 8:
         df = df.sort_values([0, 1, 2])
         df[8] = -1
         df[9] = -1
         return database.add_gps(df, url, chunk_days)
-    if df.shape[1] >= 12:
+    if df.shape[1] in (12, 13):
         return df
-    raise ValueError(f"Expected 8, 12 or 13 columns, found {df.shape[1]}")
+    raise ValueError(
+        f"Expected 8, 12 or 13 columns without a header, or an Ornitela export;"
+        f" found {df.shape[1]} columns"
+    )
 
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
-    parser.add_argument("--input", type=Path, help="an 8-, 12- or 13-column CSV")
+    parser.add_argument(
+        "--input", type=Path, help="an 8-, 12- or 13-column CSV, or an Ornitela export"
+    )
     parser.add_argument("--device", type=int, help="device to download")
     parser.add_argument("--start", help="first time, YYYY-MM-DD [HH:MM:SS]")
     parser.add_argument("--end", help="last time, inclusive")
