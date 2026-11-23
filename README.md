@@ -3,10 +3,11 @@
 Interactive app mapping bird GPS tracks, coloured by behavior predicted from
 accelerometer bursts and GPS speed.
 
-Each point on the map is one burst: 20 accelerometer samples at 20 Hz, taken
-at a GPS fix. Its colour is the behavior a trained classifier predicts for it.
-Click a point to see its accelerometer trace. Where a burst also has an expert
-label, the app shows both.
+Each point on the map is one GPS fix, with 1 to 10 seconds of accelerometer
+data taken at it (20 samples per second). A trained classifier predicts one
+behavior per second, and the point takes the colour of the first second.
+Click a point to see its accelerometer trace. Where a second also has an
+expert label, the app shows both.
 
 ## Install
 
@@ -113,6 +114,15 @@ python -m bird_behavior_map.app 6004.csv        # open http://127.0.0.1:8050
 python -m bird_behavior_map.app 6011.csv 8060   # open http://127.0.0.1:8060
 ```
 
+To try the app without a database account, use the example in `examples/`:
+`6004_gull.csv`, gull 6004 on 28 May 2013 from 10:00 to midnight, with the
+behavior already added. Without the repository folder, download it first:
+
+```bash
+curl -L -O https://github.com/fkariminejadasl/bird-behavior-map/raw/main/examples/6004_gull.csv
+python -m bird_behavior_map.app 6004_gull.csv
+```
+
 The second number, the port, is optional (default 8050) and gives the app its
 own address. To show several CSV files at the same time, start each in its own
 terminal with its own port (8060, 8070, ...) and open each address in its own
@@ -120,6 +130,9 @@ browser tab. Ctrl+C in a terminal stops that app. To switch one app to another
 file, stop it, start it with the new file and reload the page in the browser.
 
 - **Bird/device** and the **time window** slider choose what the map shows.
+- The pop-up of a point lists one behavior per second: `pred` is the
+  predicted behavior, `gt` (ground truth) the expert label, and `None` means
+  that second has no expert label. Data from the database has none.
 - **Inspect point**: click a burst to see its accelerometer trace, predicted
   and expert label, confidence, GPS speed and altitude.
 - **Select region**: click a start and an end burst. The altitude and GPS speed

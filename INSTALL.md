@@ -99,6 +99,16 @@ are written in the `bird-map` folder. Stop the app with Ctrl+C in the
 terminal. The [README](README.md) says what the app shows and what else
 `make_data` can read.
 
+No database account yet? Try the app with the example file, gull 6004 with
+its behavior already added. Instead of the `make_data` line, type
+
+```
+curl -L -O https://github.com/fkariminejadasl/bird-behavior-map/raw/main/examples/6004_gull.csv
+python -m bird_behavior_map.app 6004_gull.csv
+```
+
+and open the same address.
+
 ## If something goes wrong
 
 | message | what to do |
@@ -108,5 +118,6 @@ terminal. The [README](README.md) says what the app shows and what else
 | `No matching distribution found for torch` (Mac with an Intel chip) | PyTorch no longer ships for Macs with an Intel chip, sold before 2021; Macs with an Apple chip are fine. Making data is not possible there. The app alone still runs on a CSV someone else made: in step 4 type `pip install dash plotly pandas numpy`, then the second line with `--no-deps` added after `install`. |
 | `No module named bird_behavior_map` | The environment is off. Type `conda activate bird-map`. |
 | `Set DB_USER and DB_PASS, or give --database-url` | Update the app (step 4, with `--force-reinstall --no-deps`); it then asks for the user name and password. Or do step 5, with its last two lines, deactivate and activate. |
+| `curl is not recognized` (older Windows) | Open [the example's page](https://github.com/fkariminejadasl/bird-behavior-map/blob/main/examples/6004_gull.csv), click the download button at the top right, and move the file into the `bird-map` folder. |
 | `No bursts with a GPS fix in this range` | The device recorded no accelerometer data then. Try another range. |
 | `Address already in use` | Another program uses port 8050. Add a port: `python -m bird_behavior_map.app 6004.csv 8060`, and open 127.0.0.1:8060. |
